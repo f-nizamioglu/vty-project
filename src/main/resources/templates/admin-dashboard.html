@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alet Paylaşım Yönetici Paneli</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .tab-btn:hover {
+            background: #e9ecef;
+        }
+
+        .tab-btn.active:hover {
+            background: #0056b3;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .form-group input[type="date"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .table-container table {
+            min-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Alet Paylaşım Yönetici Paneli</h1>
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                <button type="submit" class="logout-btn">Çıkış Yap</button>
+            </form>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('tools', this)">Aletler</button>
+            <button class="tab-btn" onclick="showTab('reservations', this)">Rezervasyonlar</button>
+            <button class="tab-btn" onclick="showTab('users', this)">Kullanıcılar</button>
+            <button class="tab-btn" onclick="showTab('tool-performance', this)">Alet Performansı</button>
+        </div>
+
+        <div id="tools" class="tab-content active">
+            <div class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">Tüm Aletler</h2>
+                    <button class="btn btn-primary" onclick="openToolModal()">Alet Ekle</button>
+                </div>
+                <table th:if="${tools != null and !tools.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Alet Adı</th>
+                            <th>Kullanıcı</th>
+                            <th>Ortalama Puan</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="tool : ${tools}">
+                            <td th:text="${tool.id}"></td>
+                            <td th:text="${tool.toolName}"></td>
+                            <td th:text="${tool.user != null ? tool.user.fullName : 'N/A'}"></td>
+                            <td th:text="${tool.avgReview != null ? tool.avgReview : 'Henüz puan yok'}"></td>
+                            <td th:text="${#temporals.format(tool.created, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <button th:if="${tool.user == null or tool.user.id != currentUser.id}" 
+                                        class="btn btn-primary reserve-tool-btn" 
+                                        th:data-tool-id="${tool.id}"
+                                        style="margin-right: 5px;">
+                                    Rezerve Et
+                                </button>
+                                <form th:action="@{/tools/{id}/delete(id=${tool.id})}" method="post" style="display: inline;"
+                                      th:onclick="return confirm('Bu aleti silmek istediğinize emin misiniz? Tüm rezervasyonlar da silinecektir.')">
+                                    <button type="submit" class="btn" style="background: #dc3545; color: white;">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div th:if="${tools == null or tools.isEmpty()}" class="empty-state">
+                    <p>Henüz alet kaydı bulunmamaktadır.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="reservations" class="tab-content">
+            <div class="section">
+                <h2>Tüm Rezervasyonlar</h2>
+                <table th:if="${reservations != null and !reservations.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Alet Adı</th>
+                            <th>Kullanıcı</th>
+                            <th>Rezervasyon Tarihi</th>
+                            <th>Durum</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="reservation : ${reservations}">
+                            <td th:text="${reservation.id}"></td>
+                            <td th:text="${reservation.tool != null ? reservation.tool.toolName : 'N/A'}"></td>
+                            <td th:text="${reservation.user != null ? reservation.user.fullName : 'N/A'}"></td>
+                            <td th:text="${#temporals.format(reservation.reservationDate, 'dd/MM/yyyy')}"></td>
+                            <td>
+                                <span th:if="${reservation.review != null}" style="color: green;">Değerlendirildi</span>
+                                <span th:if="${reservation.review == null and reservation.reservationDate.isBefore(currentDate)}" style="color: orange;">Geçmiş</span>
+                                <span th:if="${reservation.review == null and !reservation.reservationDate.isBefore(currentDate)}" style="color: blue;">Aktif</span>
+                            </td>
+                            <td>
+                                <button th:if="${reservation.review == null and !reservation.reservationDate.isBefore(currentDate)}" 
+                                        class="btn btn-primary update-reservation-btn" 
+                                        th:data-reservation-id="${reservation.id}"
+                                        th:data-reservation-date="${#temporals.format(reservation.reservationDate, 'yyyy-MM-dd')}"
+                                        style="margin-right: 5px; background: #28a745;">
+                                    Tarih Güncelle
+                                </button>
+                                <form th:if="${!reservation.reservationDate.isBefore(currentDate)}" 
+                                      th:action="@{/reservations/{id}/cancel(id=${reservation.id})}" 
+                                      method="post" 
+                                      style="display: inline;"
+                                      th:onclick="return confirm('Bu rezervasyonu iptal etmek istediğinize emin misiniz?')">
+                                    <button type="submit" class="btn" style="background: #dc3545; color: white;">İptal Et</button>
+                                </form>
+                                <span th:if="${reservation.reservationDate.isBefore(currentDate)}">-</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div th:if="${reservations == null or reservations.isEmpty()}" class="empty-state">
+                    <p>Henüz rezervasyon bulunmamaktadır.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tool-performance" class="tab-content">
+            <div class="form-container" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 20px;">Filtrele</h2>
+                <p style="margin-bottom: 15px; color: #666;">
+                    Bu filtre, belirli bir rezervasyon sayısının üzerinde veya belirli bir değerlendirme puanının üzerinde olan araçları gösterir.
+                </p>
+                <form th:action="@{/dashboard}" method="get">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: end;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="minReservations">Minimum Rezervasyon Sayısı</label>
+                            <input type="number" id="minReservations" name="minReservations" 
+                                   th:value="${minReservations}" min="0" placeholder="Örn: 5">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="minReview">Minimum Review Puanı</label>
+                            <input type="number" id="minReview" name="minReview" 
+                                   th:value="${minReview}" min="0" max="5" step="0.1" placeholder="Örn: 4.0">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary">Filtrele</button>
+                            <a th:href="@{/dashboard}" class="btn btn-secondary" style="text-decoration: none; text-align: center;">Temizle</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section" th:if="${topPerformers != null}">
+                <h2>Filtreleme Sonuçları</h2>
+                <p th:if="${minReservations != null || minReview != null}" style="margin-bottom: 15px; color: #666;">
+                    <span th:if="${minReservations != null && minReservations > 0}">
+                        Minimum Rezervasyon: <strong th:text="${minReservations}"></strong>
+                    </span>
+                    <span th:if="${(minReservations != null && minReservations > 0) && (minReview != null && minReview > 0)}"> veya </span>
+                    <span th:if="${minReview != null && minReview > 0}">
+                        Minimum Review Puanı: <strong th:text="${minReview}"></strong>
+                    </span>
+                </p>
+                <div class="table-container">
+                <table th:if="${topPerformers != null && !topPerformers.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>Alet ID</th>
+                            <th>Alet Adı</th>
+                            <th>Sahip Adı</th>
+                            <th>Sahip Email</th>
+                            <th>Toplam Rezervasyon</th>
+                            <th>Toplam Review</th>
+                            <th>Hesaplanan Ort. Puan</th>
+                            <th>Alet Ort. Puanı</th>
+                            <th>İlk Rezervasyon</th>
+                            <th>Son Rezervasyon</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="view : ${topPerformers}">
+                            <td th:text="${view.toolId}"></td>
+                            <td th:text="${view.toolName}"></td>
+                            <td th:text="${view.ownerName != null ? view.ownerName : 'N/A'}"></td>
+                            <td th:text="${view.ownerEmail != null ? view.ownerEmail : 'N/A'}"></td>
+                            <td th:text="${view.totalReservations}"></td>
+                            <td th:text="${view.totalReviews}"></td>
+                            <td th:text="${view.calculatedAvgReview != null ? #numbers.formatDecimal(view.calculatedAvgReview, 1, 2) : '0.0'}"></td>
+                            <td th:text="${view.toolAvgReview != null ? #numbers.formatDecimal(view.toolAvgReview, 1, 2) : 'Henüz puan yok'}"></td>
+                            <td th:text="${view.firstReservationDate != null ? #temporals.format(view.firstReservationDate, 'dd/MM/yyyy') : 'Henüz rezervasyon yok'}"></td>
+                            <td th:text="${view.lastReservationDate != null ? #temporals.format(view.lastReservationDate, 'dd/MM/yyyy') : 'Henüz rezervasyon yok'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                <div th:if="${topPerformers != null && topPerformers.isEmpty()}" class="empty-state">
+                    <p>Belirtilen kriterlere uygun araç bulunamadı.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Tüm Alet Performans İstatistikleri</h2>
+                <div class="table-container">
+                <table th:if="${toolPerformanceViews != null and !toolPerformanceViews.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>Alet ID</th>
+                            <th>Alet Adı</th>
+                            <th>Sahip Adı</th>
+                            <th>Sahip Email</th>
+                            <th>Sahip Telefon</th>
+                            <th>Toplam Rezervasyon</th>
+                            <th>Toplam Review</th>
+                            <th>Hesaplanan Ort. Puan</th>
+                            <th>Alet Ort. Puanı</th>
+                            <th>İlk Rezervasyon</th>
+                            <th>Son Rezervasyon</th>
+                            <th>Oluşturulma Tarihi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="view : ${toolPerformanceViews}">
+                            <td th:text="${view.toolId}"></td>
+                            <td th:text="${view.toolName}"></td>
+                            <td th:text="${view.ownerName != null ? view.ownerName : 'N/A'}"></td>
+                            <td th:text="${view.ownerEmail != null ? view.ownerEmail : 'N/A'}"></td>
+                            <td th:text="${view.ownerPhone != null ? view.ownerPhone : 'N/A'}"></td>
+                            <td th:text="${view.totalReservations}"></td>
+                            <td th:text="${view.totalReviews}"></td>
+                            <td th:text="${view.calculatedAvgReview != null ? #numbers.formatDecimal(view.calculatedAvgReview, 1, 2) : '0.0'}"></td>
+                            <td th:text="${view.toolAvgReview != null ? #numbers.formatDecimal(view.toolAvgReview, 1, 2) : 'Henüz puan yok'}"></td>
+                            <td th:text="${view.firstReservationDate != null ? #temporals.format(view.firstReservationDate, 'dd/MM/yyyy') : 'Henüz rezervasyon yok'}"></td>
+                            <td th:text="${view.lastReservationDate != null ? #temporals.format(view.lastReservationDate, 'dd/MM/yyyy') : 'Henüz rezervasyon yok'}"></td>
+                            <td th:text="${view.toolCreatedDate != null ? #temporals.format(view.toolCreatedDate, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                <div th:if="${toolPerformanceViews == null or toolPerformanceViews.isEmpty()}" class="empty-state">
+                    <p>Henüz performans verisi bulunmamaktadır.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="users" class="tab-content">
+            <div class="form-container" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 20px;">Yeni Kullanıcı Ekle</h2>
+                <form th:action="@{/admin/users}" method="post">
+                    <div class="form-group">
+                        <label for="fullName">Ad Soyad</label>
+                        <input type="text" id="fullName" name="fullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Telefon Numarası</label>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Rol</label>
+                        <select id="role" name="role" required>
+                            <option value="USER">USER</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Kullanıcı Ekle</button>
+                </form>
+            </div>
+
+            <div class="form-container" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 20px;">Kullanıcı Rezervasyon İstatistikleri</h2>
+                <p style="margin-bottom: 15px; color: #666;">
+                    Bu sorgu, belirli bir rezervasyon sayısının üzerinde rezervasyonu olan kullanıcıları gösterir. 
+                </p>
+                <form th:action="@{/dashboard}" method="get">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: end;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="minUserReservations">Minimum Rezervasyon Sayısı</label>
+                            <input type="number" id="minUserReservations" name="minUserReservations" 
+                                   th:value="${minUserReservations}" min="1" placeholder="Örn: 3">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary">Filtrele</button>
+                            <a th:href="@{/dashboard}" class="btn btn-secondary" style="text-decoration: none; text-align: center;">Temizle</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section" th:if="${userReservationStats != null}">
+                <h2>Kullanıcı Rezervasyon İstatistikleri Sonuçları</h2>
+                <p th:if="${minUserReservations != null && minUserReservations > 0}" style="margin-bottom: 15px; color: #666;">
+                    Minimum Rezervasyon Sayısı: <strong th:text="${minUserReservations}"></strong>
+                </p>
+                <div class="table-container">
+                <table th:if="${userReservationStats != null && !userReservationStats.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>Kullanıcı ID</th>
+                            <th>Ad Soyad</th>
+                            <th>Email</th>
+                            <th>Telefon</th>
+                            <th>Toplam Rezervasyon Sayısı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="stat : ${userReservationStats}">
+                            <td th:text="${stat.userId}"></td>
+                            <td th:text="${stat.fullName}"></td>
+                            <td th:text="${stat.email}"></td>
+                            <td th:text="${stat.phoneNumber}"></td>
+                            <td th:text="${stat.reservationCount}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                <div th:if="${userReservationStats != null && userReservationStats.isEmpty()}" class="empty-state">
+                    <p>Belirtilen kriterlere uygun kullanıcı bulunamadı.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Tüm Kullanıcılar</h2>
+                <table th:if="${users != null and !users.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ad Soyad</th>
+                            <th>Email</th>
+                            <th>Telefon</th>
+                            <th>Rol</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.fullName}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.phoneNumber}"></td>
+                            <td th:text="${user.role}"></td>
+                            <td th:text="${#temporals.format(user.created, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <button class="btn btn-primary update-user-btn" 
+                                        th:data-user-id="${user.id}"
+                                        th:data-user-fullname="${user.fullName}"
+                                        th:data-user-email="${user.email}"
+                                        th:data-user-phone="${user.phoneNumber}"
+                                        th:data-user-role="${user.role}"
+                                        style="background: #28a745;">
+                                    Düzenle
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div th:if="${users == null or users.isEmpty()}" class="empty-state">
+                    <p>Henüz kullanıcı bulunmamaktadır.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toolModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Yeni Alet Ekle</h3>
+                <span class="close" onclick="closeToolModal()">&times;</span>
+            </div>
+            <form th:action="@{/tools}" method="post">
+                <div class="form-group">
+                    <label for="toolName">Alet Adı</label>
+                    <input type="text" id="toolName" name="toolName" required placeholder="Alet adını girin">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeToolModal()">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="reservationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Alet Rezervasyonu</h3>
+                <span class="close" onclick="closeReservationModal()">&times;</span>
+            </div>
+            <form th:action="@{/reservations}" method="post">
+                <input type="hidden" id="reservationToolId" name="toolId" value="">
+                <div class="form-group">
+                    <label for="reservationDate">Rezervasyon Tarihi</label>
+                    <input type="date" id="reservationDate" name="reservationDate" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeReservationModal()">İptal</button>
+                    <button type="submit" class="btn btn-primary">Rezerve Et</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="updateReservationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Rezervasyon Tarihi Güncelle</h3>
+                <span class="close" onclick="closeUpdateReservationModal()">&times;</span>
+            </div>
+            <form id="updateReservationForm" method="post">
+                <input type="hidden" id="updateReservationId" value="">
+                <div class="form-group">
+                    <label for="updateReservationDate">Yeni Rezervasyon Tarihi</label>
+                    <input type="date" id="updateReservationDate" name="reservationDate" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeUpdateReservationModal()">İptal</button>
+                    <button type="submit" class="btn btn-primary">Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="updateUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Kullanıcı Bilgilerini Güncelle</h3>
+                <span class="close" onclick="closeUpdateUserModal()">&times;</span>
+            </div>
+            <form id="updateUserForm" method="post">
+                <input type="hidden" id="updateUserId" value="">
+                <div class="form-group">
+                    <label for="updateFullName">Ad Soyad</label>
+                    <input type="text" id="updateFullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="updateEmail">Email</label>
+                    <input type="email" id="updateEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="updatePhoneNumber">Telefon Numarası</label>
+                    <input type="tel" id="updatePhoneNumber" name="phoneNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="updateRole">Rol</label>
+                    <select id="updateRole" name="role" required>
+                        <option value="USER">USER</option>
+                        <option value="ADMIN">ADMIN</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeUpdateUserModal()">İptal</button>
+                    <button type="submit" class="btn btn-primary">Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName, button) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            if (button) {
+                button.classList.add('active');
+            }
+        }
+
+        function openToolModal() {
+            document.getElementById('toolModal').style.display = 'block';
+        }
+
+        function closeToolModal() {
+            document.getElementById('toolModal').style.display = 'none';
+            document.getElementById('toolName').value = '';
+        }
+
+        function openReservationModal(toolId) {
+            document.getElementById('reservationToolId').value = toolId;
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reservationDate').setAttribute('min', today);
+            document.getElementById('reservationModal').style.display = 'block';
+        }
+
+        function closeReservationModal() {
+            document.getElementById('reservationModal').style.display = 'none';
+            document.getElementById('reservationDate').value = '';
+        }
+
+        function openUpdateReservationModal(reservationId, currentDate) {
+            document.getElementById('updateReservationId').value = reservationId;
+            document.getElementById('updateReservationDate').value = currentDate;
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('updateReservationDate').setAttribute('min', today);
+            document.getElementById('updateReservationForm').action = '/reservations/' + reservationId + '/update';
+            document.getElementById('updateReservationModal').style.display = 'block';
+        }
+
+        function closeUpdateReservationModal() {
+            document.getElementById('updateReservationModal').style.display = 'none';
+            document.getElementById('updateReservationDate').value = '';
+        }
+
+        function openUpdateUserModal(userId, fullName, email, phoneNumber, role) {
+            document.getElementById('updateUserId').value = userId;
+            document.getElementById('updateFullName').value = fullName;
+            document.getElementById('updateEmail').value = email;
+            document.getElementById('updatePhoneNumber').value = phoneNumber;
+            document.getElementById('updateRole').value = role;
+            document.getElementById('updateUserForm').action = '/admin/users/' + userId + '/update';
+            document.getElementById('updateUserModal').style.display = 'block';
+        }
+
+        function closeUpdateUserModal() {
+            document.getElementById('updateUserModal').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.reserve-tool-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const toolId = this.getAttribute('data-tool-id');
+                    openReservationModal(toolId);
+                });
+            });
+
+            document.querySelectorAll('.update-reservation-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const reservationId = this.getAttribute('data-reservation-id');
+                    const currentDate = this.getAttribute('data-reservation-date');
+                    openUpdateReservationModal(reservationId, currentDate);
+                });
+            });
+
+            document.querySelectorAll('.update-user-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    const fullName = this.getAttribute('data-user-fullname');
+                    const email = this.getAttribute('data-user-email');
+                    const phoneNumber = this.getAttribute('data-user-phone');
+                    const role = this.getAttribute('data-user-role');
+                    openUpdateUserModal(userId, fullName, email, phoneNumber, role);
+                });
+            });
+        });
+
+        window.onclick = function(event) {
+            const toolModal = document.getElementById('toolModal');
+            const reservationModal = document.getElementById('reservationModal');
+            const updateReservationModal = document.getElementById('updateReservationModal');
+            const updateUserModal = document.getElementById('updateUserModal');
+            if (event.target == toolModal) {
+                closeToolModal();
+            }
+            if (event.target == reservationModal) {
+                closeReservationModal();
+            }
+            if (event.target == updateReservationModal) {
+                closeUpdateReservationModal();
+            }
+            if (event.target == updateUserModal) {
+                closeUpdateUserModal();
+            }
+        }
+    </script>
+</body>
+</html>
+
