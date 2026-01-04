@@ -36,6 +36,11 @@ public class DashboardController {
     private final UserRepository userRepository;
     private final ToolPerformanceViewRepository toolPerformanceViewRepository;
 
+    @GetMapping("/")
+    public String root() {
+        return "redirect:/dashboard";
+    }
+
     @GetMapping("/dashboard")
     @Transactional(readOnly = true)
     public String dashboard(@RequestParam(required = false) Long minReservations,
